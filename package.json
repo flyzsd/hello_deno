@@ -1,18 +1,14 @@
 {
   "name": "hello_deno",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "hello world deno!!",
   "directories": {
     "lib": "lib"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "deno_ls_plugin": "^0.1.0",
     "typescript": "^3.5.3"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
