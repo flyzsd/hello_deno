@@ -1,1 +1,1 @@
-export { writeJson, writeJsonSync } from "https://deno.land/std/fs/mod.ts";
+export { writeJson, readJson, readFileStr, writeFileStr } from "https://deno.land/std/fs/mod.ts";
