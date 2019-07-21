@@ -2,6 +2,8 @@ import { writeJson, readJson, readFileStr } from "./deps.ts";
 console.log("Welcome to Deno 🦕");
 
 const { Deno } = window;
+const env = Deno.env();
+console.table(env);
 
 window.onload = async function () {
     console.log('onload');
@@ -21,3 +23,6 @@ console.log(Deno);
 console.dir(window.Deno);
 console.dir(console);
 console.log(window.location.href);
+console.table(Deno.metrics());
+console.table(Deno.resources());
+console.table(Deno.permissions());
