@@ -26,3 +26,4 @@ console.log(window.location.href);
 console.table(Deno.metrics());
 console.table(Deno.resources());
 console.table(Deno.permissions());
+console.log(globalThis);

@@ -6,6 +6,7 @@ window.onload = () => {
     const hex: number = 0xf00d;
     const binary: number = 0b1010;
     const octal: number = 0o744;
+    const readableBudget = 1_000_000;
     // string
     const red: string = "red";
     const blue: string = 'blue';
@@ -47,4 +48,9 @@ window.onload = () => {
     const s : any = 'hello';
     const length : number = (<string>s).length;
     const length2 : number = (s as string).length;
+
+    // non-null assertion operator
+    let person: { name: string } | null = { name: 'tom' };
+    // person = null;
+    console.log(person!.name);
 };

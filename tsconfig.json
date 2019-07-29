@@ -26,6 +26,7 @@
     "resolveJsonModule": true,
     "target": "esnext",
     "noImplicitAny": true,
+    "noImplicitThis": true,
     "strictNullChecks": true
   },
   "include": [
