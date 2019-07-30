@@ -1,4 +1,4 @@
-window.onload = () => {
+window.onload = async () => {
     // boolean
     const b: boolean = false;
     // number
@@ -53,4 +53,11 @@ window.onload = () => {
     let person: { name: string } | null = { name: 'tom' };
     // person = null;
     console.log(person!.name);
+
+    // json
+    const t = {name: '\/`"></?'};
+    console.log(JSON.stringify(t));
+
+    //typeof
+    //instanceof
 };
