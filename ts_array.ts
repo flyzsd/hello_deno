@@ -6,6 +6,9 @@ window.onload = async () => {
     traverseArray4(numbers);
     sortArray(numbers);
     combineArray();
+    cloneArray();
+    addItemAtBeginingOfArray();
+    addItemAtEndOfArray();
 };
 
 const traverseArray1 = (numbers: number[]): void => {
@@ -57,4 +60,44 @@ const combineArray = (): void => {
     console.log(numbers1);
     console.log(numbers2);
     console.log(numbers3);
+};
+
+const cloneArray = (): void => {
+    const numbers = [12, 56, 43, 34];
+
+    const numbers1 = numbers.slice();
+    const numbers2 = [...numbers];
+    const numbers3 = Array.from(numbers);
+    console.log(numbers1);
+    console.log(numbers2);
+    console.log(numbers3);
+};
+
+const addItemAtBeginingOfArray = (): void => {
+    const numbers = [12, 56, 43, 34];
+    numbers.unshift(11);
+    console.log(numbers);
+    const number1 = [11, ...numbers];
+};
+
+const addItemAtEndOfArray = (): void => {
+    const numbers = [12, 56, 43, 34];
+    numbers.push(11);
+    console.log(numbers);
+    const number1 = [...numbers, 11];
+};
+
+const removeItemAtBeginingOfArray = (): void => {
+    const numbers = [12, 56, 43, 34];
+    numbers.shift();
+    console.log(numbers);
+    const [e, ...number1] = numbers;
+    const numbers2 = numbers.slice(1);
+};
+
+const removeItemAtEndOfArray = (): void => {
+    const numbers = [12, 56, 43, 34];
+    numbers.pop();
+    console.log(numbers);
+    const numbers1 = numbers.slice(0, numbers.length - 1);
 };

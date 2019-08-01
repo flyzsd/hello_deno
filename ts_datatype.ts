@@ -7,6 +7,9 @@ window.onload = async () => {
     const binary: number = 0b1010;
     const octal: number = 0o744;
     const readableBudget = 1_000_000;
+    const number1 = 99;
+    const number2 = 99.0000;
+    console.log(`number1 === number2 --> ${number1 === number2}`);
     // string
     const red: string = "red";
     const blue: string = 'blue';
