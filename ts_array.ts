@@ -33,6 +33,7 @@ const traverseArray3 = (numbers: Iterable<number>): void => {
 // iterate over the properties of an object (the object keys)
 const traverseArray4 = (numbers: Object): void => {
     for(const name in numbers) {
+        //@ts-ignore
         console.log(`${name} = ${numbers[name]}`)
     }
 };

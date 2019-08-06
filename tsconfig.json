@@ -27,6 +27,8 @@
     "target": "esnext",
     /* Enable all strict type-checking options. */
     "strict": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
   },
   "include": [
     "./**/*.ts"
