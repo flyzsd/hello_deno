@@ -25,9 +25,8 @@
     "pretty": true,
     "resolveJsonModule": true,
     "target": "esnext",
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true
+    /* Enable all strict type-checking options. */
+    "strict": true,
   },
   "include": [
     "./**/*.ts"
