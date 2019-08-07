@@ -2,9 +2,6 @@
   "name": "hello_deno",
   "version": "1.0.0",
   "description": "hello world deno!!",
-  "directories": {
-    "lib": "lib"
-  },
   "dependencies": {},
   "devDependencies": {
     "deno_ls_plugin": "^0.1.0",

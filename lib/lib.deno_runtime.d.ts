@@ -349,6 +349,12 @@ declare namespace Deno {
   /** Read synchronously `r` until EOF and return the content as `Uint8Array`.
    */
   export function readAllSync(r: SyncReader): Uint8Array;
+  /** Write all the content of `arr` to `w`.
+   */
+  export function writeAll(w: Writer, arr: Uint8Array): Promise<void>;
+  /** Write synchronously all the content of `arr` to `w`.
+   */
+  export function writeAllSync(w: SyncWriter, arr: Uint8Array): void;
   /** Creates a new directory with the specified path synchronously.
    * If `recursive` is set to true, nested directories will be created (also known
    * as "mkdir -p").
@@ -670,6 +676,38 @@ declare namespace Deno {
     data: Uint8Array,
     options?: WriteFileOptions
   ): Promise<void>;
+  interface Location {
+    /** The full url for the module, e.g. `file://some/file.ts` or
+     * `https://some/file.ts`. */
+    filename: string;
+    /** The line number in the file.  It is assumed to be 1-indexed. */
+    line: number;
+    /** The column number in the file.  It is assumed to be 1-indexed. */
+    column: number;
+  }
+  /** Given a current location in a module, lookup the source location and
+   * return it.
+   *
+   * When Deno transpiles code, it keep source maps of the transpiled code.  This
+   * function can be used to lookup the original location.  This is automatically
+   * done when accessing the `.stack` of an error, or when an uncaught error is
+   * logged.  This function can be used to perform the lookup for creating better
+   * error handling.
+   *
+   * **Note:** `line` and `column` are 1 indexed, which matches display
+   * expectations, but is not typical of most index numbers in Deno.
+   *
+   * An example:
+   *
+   *       const orig = Deno.applySourceMap({
+   *         location: "file://my/module.ts",
+   *         line: 5,
+   *         column: 15
+   *       });
+   *       console.log(`${orig.filename}:${orig.line}:${orig.column}`);
+   *
+   */
+  export function applySourceMap(location: Location): Location;
   export enum ErrorKind {
     NoError = 0,
     NotFound = 1,
@@ -719,8 +757,9 @@ declare namespace Deno {
     InvalidPath = 45,
     ImportPrefixMissing = 46,
     UnsupportedFetchScheme = 47,
-    Diagnostic = 48,
-    JSError = 49
+    TooManyRedirects = 48,
+    Diagnostic = 49,
+    JSError = 50
   }
   /** A Deno specific error.  The `kind` property is set to a specific error code
    * which can be used to in application logic.
@@ -2233,17 +2272,17 @@ declare namespace timers {
   /** Sets a timer which executes a function once after the timer expires. */
   export function setTimeout(
     cb: (...args: Args) => void,
-    delay: number,
+    delay?: number,
     ...args: Args
   ): number;
   /** Repeatedly calls a function , with a fixed time delay between each call. */
   export function setInterval(
     cb: (...args: Args) => void,
-    delay: number,
+    delay?: number,
     ...args: Args
   ): number;
-  export function clearTimeout(id: number): void;
-  export function clearInterval(id: number): void;
+  export function clearTimeout(id?: number): void;
+  export function clearInterval(id?: number): void;
 }
 
 declare namespace urlSearchParams {
