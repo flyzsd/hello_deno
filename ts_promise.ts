@@ -4,7 +4,9 @@ const message$: Promise<string> = new Promise((resolve, reject) => {
 
 message$.then(message => {
     console.log(`message -> ${message}`);
+    // generally we have 3 options here
     // throw new Error('simulate error');
+    // return a synchronous value
     // return Promise.reject(new Error('simulate error'));
     return message;
 }).then(message => {
@@ -45,6 +47,7 @@ const reject$: Promise<string> = new Promise((resolve, reject) => {
 });
 
 const testAsyncFunction = async () => {
+    console.log(`async/await rocks!!`);
     try {
         const message = await reject$;
         return message;
@@ -90,4 +93,6 @@ Promise.race([Promise.resolve(1), Promise.reject(2), Promise.reject(3), Promise.
 //     console.log(`Promise.allSettled - resolved - ${value}`);
 // }).catch(reason => {
 //     console.log(`Promise.allSettled - rejected - ${reason}`);
-// });
+// });'
+
+Promise.resolve().then(() => console.log(`the passed in function is put on microtask queue`));
