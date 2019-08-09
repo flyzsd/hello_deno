@@ -12,7 +12,7 @@ window.onload = async () => {
 };
 
 const traverseArray1 = (numbers: number[]): void => {
-    for(let i = 0; i < numbers.length; i++) {
+    for (let i = 0; i < numbers.length; i++) {
         console.log(`${i} = ${numbers[i]}`)
     }
 };
@@ -25,14 +25,14 @@ const traverseArray2 = (numbers: number[]): void => {
 
 // iterate over iterable type, such as array, map, set, DOM node collections etc
 const traverseArray3 = (numbers: Iterable<number>): void => {
-    for(const value of numbers) {
+    for (const value of numbers) {
         console.log(`${value}`)
     }
 };
 
 // iterate over the properties of an object (the object keys)
 const traverseArray4 = (numbers: Object): void => {
-    for(const name in numbers) {
+    for (const name in numbers) {
         //@ts-ignore
         console.log(`${name} = ${numbers[name]}`)
     }

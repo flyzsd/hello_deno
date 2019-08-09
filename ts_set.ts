@@ -27,6 +27,15 @@ window.onload = async () => {
         console.log(`value = ${value}`);
     });
 
+    // clone set
+    const clonedSet = new Set(set);
+    console.log(`cloned set -> ${clonedSet}, size = ${clonedSet.size}`)
+
+    // merge set
+    const set2 = new Set([10, 11]);
+    const mergedSet = new Set([...set, ...set2]);
+    console.log(`cloned set -> ${mergedSet}, size = ${mergedSet.size}`)
+
     const array1 = Array.from(set);
     const array2 = [...set];
     console.log(`array1.length = ${array1.length}`);
