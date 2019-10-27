@@ -1,15 +1,18 @@
 // Copyright 2018-2019 the Deno authors. All rights reserved. MIT license.
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-interface */
+
 /// <reference no-default-lib="true" />
 /// <reference lib="esnext" />
 
 declare namespace Deno {
+  // @url js/os.d.ts
+
   /** The current process id of the runtime. */
   export let pid: number;
   /** Reflects the NO_COLOR environment variable: https://no-color.org/ */
   export let noColor: boolean;
-  /** Path to the current deno process's executable file. */
-  export let execPath: string;
   /** Check if running in terminal.
    *
    *       console.log(Deno.isTTY().stdout);
@@ -19,8 +22,14 @@ declare namespace Deno {
     stdout: boolean;
     stderr: boolean;
   };
+  /** Get the hostname.
+   * Requires the `--allow-env` flag.
+   *
+   *       console.log(Deno.hostname());
+   */
+  export function hostname(): string;
   /** Exit the Deno process with optional exit code. */
-  export function exit(exitCode?: number): never;
+  export function exit(code?: number): never;
   /** Returns a snapshot of the environment variables at invocation. Mutating a
    * property in the object will set that variable in the environment for
    * the process. The environment object will only accept `string`s
@@ -35,11 +44,29 @@ declare namespace Deno {
   export function env(): {
     [index: string]: string;
   };
+  /** Returns the value of an environment variable at invocation.
+   * If the variable is not present, `undefined` will be returned.
+   *
+   *       const myEnv = Deno.env();
+   *       console.log(myEnv.SHELL);
+   *       myEnv.TEST_VAR = "HELLO";
+   *       const newEnv = Deno.env();
+   *       console.log(myEnv.TEST_VAR == newEnv.TEST_VAR);
+   */
+  export function env(key: string): string | undefined;
   /**
    * Returns the current user's home directory.
-   * Does not require elevated privileges.
+   * Requires the `--allow-env` flag.
    */
   export function homeDir(): string;
+  /**
+   * Returns the path to the current deno executable.
+   * Requires the `--allow-env` flag.
+   */
+  export function execPath(): string;
+
+  // @url js/dir.d.ts
+
   /**
    * `cwd()` Return a string representing the current working directory.
    * If the current directory can be reached via multiple paths
@@ -53,6 +80,9 @@ declare namespace Deno {
    * throws `NotFound` exception if directory not available
    */
   export function chdir(directory: string): void;
+
+  // @url js/io.d.ts
+
   export const EOF: null;
   export type EOF = null;
   export enum SeekMode {
@@ -137,6 +167,9 @@ declare namespace Deno {
    *      }
    */
   export function toAsyncIterator(r: Reader): AsyncIterableIterator<Uint8Array>;
+
+  // @url js/files.d.ts
+
   /** Open a file and return an instance of the `File` object
    *  synchronously.
    *
@@ -266,6 +299,9 @@ declare namespace Deno {
     | "x"
     /** Read-write. Behaves like `x` and allows to read from file. */
     | "x+";
+
+  // @url js/buffer.d.ts
+
   /** A Buffer is a variable-sized buffer of bytes with read() and write()
    * methods. Based on https://golang.org/pkg/bytes/#Buffer
    */
@@ -355,6 +391,9 @@ declare namespace Deno {
   /** Write synchronously all the content of `arr` to `w`.
    */
   export function writeAllSync(w: SyncWriter, arr: Uint8Array): void;
+
+  // @url js/mkdir.d.ts
+
   /** Creates a new directory with the specified path synchronously.
    * If `recursive` is set to true, nested directories will be created (also known
    * as "mkdir -p").
@@ -383,6 +422,9 @@ declare namespace Deno {
     recursive?: boolean,
     mode?: number
   ): Promise<void>;
+
+  // @url js/make_temp_dir.d.ts
+
   export interface MakeTempDirOptions {
     dir?: string;
     prefix?: string;
@@ -406,6 +448,9 @@ declare namespace Deno {
    *       const tempDirName1 = await Deno.makeTempDir({ prefix: 'my_temp' });
    */
   export function makeTempDir(options?: MakeTempDirOptions): Promise<string>;
+
+  // @url js/chmod.d.ts
+
   /** Changes the permission of a specific file/directory of specified path
    * synchronously.
    *
@@ -417,6 +462,9 @@ declare namespace Deno {
    *       await Deno.chmod("/path/to/file", 0o666);
    */
   export function chmod(path: string, mode: number): Promise<void>;
+
+  // @url js/chown.d.ts
+
   /**
    * Change owner of a regular file or directory synchronously. Unix only at the moment.
    * @param path path to the file
@@ -431,6 +479,9 @@ declare namespace Deno {
    * @param gid group id of the new owner
    */
   export function chown(path: string, uid: number, gid: number): Promise<void>;
+
+  // @url js/utime.d.ts
+
   /** Synchronously changes the access and modification times of a file system
    * object referenced by `filename`. Given times are either in seconds
    * (Unix epoch time) or as `Date` objects.
@@ -453,6 +504,9 @@ declare namespace Deno {
     atime: number | Date,
     mtime: number | Date
   ): Promise<void>;
+
+  // @url js/remove.d.ts
+
   export interface RemoveOption {
     recursive?: boolean;
   }
@@ -472,6 +526,9 @@ declare namespace Deno {
    *       await Deno.remove("/path/to/dir/or/file", {recursive: false});
    */
   export function remove(path: string, options?: RemoveOption): Promise<void>;
+
+  // @url js/rename.d.ts
+
   /** Synchronously renames (moves) `oldpath` to `newpath`. If `newpath` already
    * exists and is not a directory, `renameSync()` replaces it. OS-specific
    * restrictions may apply when `oldpath` and `newpath` are in different
@@ -487,6 +544,9 @@ declare namespace Deno {
    *       await Deno.rename("old/path", "new/path");
    */
   export function rename(oldpath: string, newpath: string): Promise<void>;
+
+  // @url js/read_file.d.ts
+
   /** Read the entire contents of a file synchronously.
    *
    *       const decoder = new TextDecoder("utf-8");
@@ -501,6 +561,9 @@ declare namespace Deno {
    *       console.log(decoder.decode(data));
    */
   export function readFile(filename: string): Promise<Uint8Array>;
+
+  // @url js/file_info.d.ts
+
   /** A FileInfo describes a file and is returned by `stat`, `lstat`,
    * `statSync`, `lstatSync`.
    */
@@ -541,6 +604,9 @@ declare namespace Deno {
      */
     isSymlink(): boolean;
   }
+
+  // @url js/read_dir.d.ts
+
   /** Reads the directory given by path and returns a list of file info
    * synchronously.
    *
@@ -552,6 +618,9 @@ declare namespace Deno {
    *       const files = await Deno.readDir("/");
    */
   export function readDir(path: string): Promise<FileInfo[]>;
+
+  // @url js/copy_file.d.ts
+
   /** Copies the contents of a file to another by name synchronously.
    * Creates a new file if target does not exists, and if target exists,
    * overwrites original content of the target file.
@@ -573,6 +642,9 @@ declare namespace Deno {
    *       await Deno.copyFile("from.txt", "to.txt");
    */
   export function copyFile(from: string, to: string): Promise<void>;
+
+  // @url js/read_link.d.ts
+
   /** Returns the destination of the named symbolic link synchronously.
    *
    *       const targetPath = Deno.readlinkSync("symlink/path");
@@ -583,6 +655,20 @@ declare namespace Deno {
    *       const targetPath = await Deno.readlink("symlink/path");
    */
   export function readlink(name: string): Promise<string>;
+
+  // @url js/stat.d.ts
+
+  interface StatResponse {
+    isFile: boolean;
+    isSymlink: boolean;
+    len: number;
+    modified: number;
+    accessed: number;
+    created: number;
+    mode: number;
+    hasMode: boolean;
+    name: string | null;
+  }
   /** Queries the file system for information on the path provided. If the given
    * path is a symlink information about the symlink will be returned.
    *
@@ -612,6 +698,9 @@ declare namespace Deno {
    *       assert(fileInfo.isFile());
    */
   export function statSync(filename: string): FileInfo;
+
+  // @url js/link.d.ts
+
   /** Synchronously creates `newname` as a hard link to `oldname`.
    *
    *       Deno.linkSync("old/name", "new/name");
@@ -622,6 +711,9 @@ declare namespace Deno {
    *       await Deno.link("old/name", "new/name");
    */
   export function link(oldname: string, newname: string): Promise<void>;
+
+  // @url js/symlink.d.ts
+
   /** Synchronously creates `newname` as a symbolic link to `oldname`. The type
    * argument can be set to `dir` or `file` and is only available on Windows
    * (ignored on other platforms).
@@ -644,6 +736,9 @@ declare namespace Deno {
     newname: string,
     type?: string
   ): Promise<void>;
+
+  // @url js/write_file.d.ts
+
   /** Options for writing to a file.
    * `perm` would change the file's permission if set.
    * `create` decides if the file should be created if not exists (default: true)
@@ -676,6 +771,9 @@ declare namespace Deno {
     data: Uint8Array,
     options?: WriteFileOptions
   ): Promise<void>;
+
+  // @url js/error_stack.d.ts
+
   interface Location {
     /** The full url for the module, e.g. `file://some/file.ts` or
      * `https://some/file.ts`. */
@@ -708,6 +806,28 @@ declare namespace Deno {
    *
    */
   export function applySourceMap(location: Location): Location;
+
+  // @url js/errors.d.ts
+
+  /** A Deno specific error.  The `kind` property is set to a specific error code
+   * which can be used to in application logic.
+   *
+   *       try {
+   *         somethingThatMightThrow();
+   *       } catch (e) {
+   *         if (
+   *           e instanceof Deno.DenoError &&
+   *           e.kind === Deno.ErrorKind.Overflow
+   *         ) {
+   *           console.error("Overflow error!");
+   *         }
+   *       }
+   *
+   */
+  export class DenoError<T extends ErrorKind> extends Error {
+    readonly kind: T;
+    constructor(kind: T, msg: string);
+  }
   export enum ErrorKind {
     NoError = 0,
     NotFound = 1,
@@ -761,25 +881,9 @@ declare namespace Deno {
     Diagnostic = 49,
     JSError = 50
   }
-  /** A Deno specific error.  The `kind` property is set to a specific error code
-   * which can be used to in application logic.
-   *
-   *       try {
-   *         somethingThatMightThrow();
-   *       } catch (e) {
-   *         if (
-   *           e instanceof Deno.DenoError &&
-   *           e.kind === Deno.ErrorKind.Overflow
-   *         ) {
-   *           console.error("Overflow error!");
-   *         }
-   *       }
-   *
-   */
-  export class DenoError<T extends ErrorKind> extends Error {
-    readonly kind: T;
-    constructor(kind: T, msg: string);
-  }
+
+  // @url js/permissions.d.ts
+
   /** Permissions as granted by the caller */
   export interface Permissions {
     read: boolean;
@@ -807,6 +911,9 @@ declare namespace Deno {
    *       Deno.readFile("example.test"); // -> error or permission prompt
    */
   export function revokePermission(permission: Permission): void;
+
+  // @url js/truncate.d.ts
+
   /** Truncates or extends the specified file synchronously, updating the size of
    * this file to become size.
    *
@@ -820,8 +927,15 @@ declare namespace Deno {
    *       await Deno.truncate("hello.txt", 10);
    */
   export function truncate(name: string, len?: number): Promise<void>;
-  type Network = "tcp";
-  type Addr = string;
+
+  // @url js/net.d.ts
+
+  type Transport = "tcp";
+  interface Addr {
+    transport: Transport;
+    address: string;
+  }
+
   /** A Listener is a generic network listener for stream-oriented protocols. */
   export interface Listener extends AsyncIterator<Conn> {
     /** Waits for and resolves to the next connection to the `Listener`. */
@@ -850,52 +964,68 @@ declare namespace Deno {
      */
     closeWrite(): void;
   }
-  /** Listen announces on the local network address.
+
+  export interface ListenOptions {
+    port: number;
+    hostname?: string;
+    transport?: Transport;
+  }
+
+  /** Listen announces on the local transport address.
    *
-   * The network must be `tcp`, `tcp4`, `tcp6`, `unix` or `unixpacket`.
-   *
-   * For TCP networks, if the host in the address parameter is empty or a literal
-   * unspecified IP address, `listen()` listens on all available unicast and
-   * anycast IP addresses of the local system. To only use IPv4, use network
-   * `tcp4`. The address can use a host name, but this is not recommended,
-   * because it will create a listener for at most one of the host's IP
-   * addresses. If the port in the address parameter is empty or `0`, as in
-   * `127.0.0.1:` or `[::1]:0`, a port number is automatically chosen. The
-   * `addr()` method of `Listener` can be used to discover the chosen port.
-   *
-   * See `dial()` for a description of the network and address parameters.
-   */
-  export function listen(network: Network, address: string): Listener;
-  /** Dial connects to the address on the named network.
-   *
-   * Supported networks are only `tcp` currently.
-   *
-   * TODO: `tcp4` (IPv4-only), `tcp6` (IPv6-only), `udp`, `udp4` (IPv4-only),
-   * `udp6` (IPv6-only), `ip`, `ip4` (IPv4-only), `ip6` (IPv6-only), `unix`,
-   * `unixgram` and `unixpacket`.
-   *
-   * For TCP and UDP networks, the address has the form `host:port`. The host must
-   * be a literal IP address, or a host name that can be resolved to IP addresses.
-   * The port must be a literal port number or a service name. If the host is a
-   * literal IPv6 address it must be enclosed in square brackets, as in
-   * `[2001:db8::1]:80` or `[fe80::1%zone]:80`. The zone specifies the scope of
-   * the literal IPv6 address as defined in RFC 4007. The functions JoinHostPort
-   * and SplitHostPort manipulate a pair of host and port in this form. When using
-   * TCP, and the host resolves to multiple IP addresses, Dial will try each IP
-   * address in order until one succeeds.
+   * @param options
+   * @param options.port The port to connect to. (Required.)
+   * @param options.hostname A literal IP address or host name that can be
+   *   resolved to an IP address. If not specified, defaults to 0.0.0.0
+   * @param options.transport Defaults to "tcp". Later we plan to add "tcp4",
+   *   "tcp6", "udp", "udp4", "udp6", "ip", "ip4", "ip6", "unix", "unixgram" and
+   *   "unixpacket".
    *
    * Examples:
    *
-   *     dial("tcp", "golang.org:http")
-   *     dial("tcp", "192.0.2.1:http")
-   *     dial("tcp", "198.51.100.1:80")
-   *     dial("udp", "[2001:db8::1]:domain")
-   *     dial("udp", "[fe80::1%lo0]:53")
-   *     dial("tcp", ":80")
+   *     listen({ port: 80 })
+   *     listen({ hostname: "192.0.2.1", port: 80 })
+   *     listen({ hostname: "[2001:db8::1]", port: 80 });
+   *     listen({ hostname: "golang.org", port: 80, transport: "tcp" })
    */
-  export function dial(network: Network, address: string): Promise<Conn>;
-  /** **RESERVED** */
-  export function connect(_network: Network, _address: string): Promise<Conn>;
+  export function listen(options: ListenOptions): Listener;
+
+  export interface DialOptions {
+    port: number;
+    hostname?: string;
+    transport?: Transport;
+  }
+
+  /** Dial connects to the address on the named transport.
+   *
+   * @param options
+   * @param options.port The port to connect to. (Required.)
+   * @param options.hostname A literal IP address or host name that can be
+   *   resolved to an IP address. If not specified, defaults to 127.0.0.1
+   * @param options.transport Defaults to "tcp". Later we plan to add "tcp4",
+   *   "tcp6", "udp", "udp4", "udp6", "ip", "ip4", "ip6", "unix", "unixgram" and
+   *   "unixpacket".
+   *
+   * Examples:
+   *
+   *     dial({ port: 80 })
+   *     dial({ hostname: "192.0.2.1", port: 80 })
+   *     dial({ hostname: "[2001:db8::1]", port: 80 });
+   *     dial({ hostname: "golang.org", port: 80, transport: "tcp" })
+   */
+  export function dial(options: DialOptions): Promise<Conn>;
+
+  export interface DialTLSOptions {
+    port: number;
+    hostname?: string;
+  }
+
+  /**
+   * dialTLS establishes a secure connection over TLS (transport layer security).
+   */
+  export function dialTLS(options: DialTLSOptions): Promise<Conn>;
+
+  // @url js/metrics.d.ts
   export interface Metrics {
     opsDispatched: number;
     opsCompleted: number;
@@ -917,6 +1047,9 @@ declare namespace Deno {
    *      └──────────────────┴────────┘
    */
   export function metrics(): Metrics;
+
+  // @url js/resources.d.ts
+
   interface ResourceMap {
     [rid: number]: string;
   }
@@ -924,6 +1057,9 @@ declare namespace Deno {
    * representation.
    */
   export function resources(): ResourceMap;
+
+  // @url js/process.d.ts
+
   /** How to handle subprocess stdio.
    *
    * "inherit" The default if unspecified. The child inherits from the
@@ -949,6 +1085,7 @@ declare namespace Deno {
   /** Send a signal to process under given PID. Unix only at this moment.
    * If pid is negative, the signal will be sent to the process group identified
    * by -pid.
+   * Requires the `--allow-run` flag.
    */
   export function kill(pid: number, signo: number): void;
   export class Process {
@@ -1060,67 +1197,27 @@ declare namespace Deno {
    */
   export const Signal: typeof MacOSSignal | typeof LinuxSignal;
   export {};
+
+  // @url js/console.d.ts
+
   type ConsoleOptions = Partial<{
     showHidden: boolean;
     depth: number;
     colors: boolean;
     indentLevel: number;
-    collapsedAt: number | null;
   }>;
-  class CSI {
-    static kClear: string;
-    static kClearScreenDown: string;
-  }
-  export const isConsoleInstance: unique symbol;
-  class Console {
-    private printFunc;
-    indentLevel: number;
-    collapsedAt: number | null;
-    [isConsoleInstance]: boolean;
-    /** Writes the arguments to stdout */
-    log: (...args: unknown[]) => void;
-    /** Writes the arguments to stdout */
-    debug: (...args: unknown[]) => void;
-    /** Writes the arguments to stdout */
-    info: (...args: unknown[]) => void;
-    /** Writes the properties of the supplied `obj` to stdout */
-    dir: (
-      obj: unknown,
-      options?: Partial<{
-        showHidden: boolean;
-        depth: number;
-        colors: boolean;
-        indentLevel: number;
-        collapsedAt: number | null;
-      }>
-    ) => void;
-    /** Writes the arguments to stdout */
-    warn: (...args: unknown[]) => void;
-    /** Writes the arguments to stdout */
-    error: (...args: unknown[]) => void;
-    /** Writes an error message to stdout if the assertion is `false`. If the
-     * assertion is `true`, nothing happens.
-     *
-     * ref: https://console.spec.whatwg.org/#assert
-     */
-    assert: (condition?: boolean, ...args: unknown[]) => void;
-    count: (label?: string) => void;
-    countReset: (label?: string) => void;
-    table: (data: unknown, properties?: string[] | undefined) => void;
-    time: (label?: string) => void;
-    timeLog: (label?: string, ...args: unknown[]) => void;
-    timeEnd: (label?: string) => void;
-    group: (...label: unknown[]) => void;
-    groupCollapsed: (...label: unknown[]) => void;
-    groupEnd: () => void;
-    clear: () => void;
-    static [Symbol.hasInstance](instance: Console): boolean;
-  }
+  /** A symbol which can be used as a key for a custom method which will be called
+   * when `Deno.inspect()` is called, or when the object is logged to the console.
+   */
+  export const customInspect: unique symbol;
   /**
    * `inspect()` converts input into string that has the same format
    * as printed by `console.log(...)`;
    */
   export function inspect(value: unknown, options?: ConsoleOptions): string;
+
+  // @url js/build.d.ts
+
   export type OperatingSystem = "mac" | "win" | "linux";
   export type Arch = "x64" | "arm64";
   /** Build related information */
@@ -1129,11 +1226,11 @@ declare namespace Deno {
     arch: Arch;
     /** The operating system. */
     os: OperatingSystem;
-    /** The arguments passed to GN during build. See `gn help buildargs`. */
-    args: string;
   }
   export const build: BuildInfo;
-  export const platform: BuildInfo;
+
+  // @url js/version.d.ts
+
   interface Version {
     deno: string;
     v8: string;
@@ -1141,11 +1238,16 @@ declare namespace Deno {
   }
   export const version: Version;
   export {};
+
+  // @url js/deno.d.ts
+
   export const args: string[];
 }
 
+// @url js/globals.ts
+
 declare interface Window {
-  window: Window;
+  window: Window & typeof globalThis;
   atob: typeof textEncoding.atob;
   btoa: typeof textEncoding.btoa;
   fetch: typeof fetchTypes.fetch;
@@ -1156,14 +1258,12 @@ declare interface Window {
   setInterval: typeof timers.setInterval;
   location: domTypes.Location;
   onload: Function | undefined;
+  onunload: Function | undefined;
   crypto: Crypto;
   Blob: typeof blob.DenoBlob;
   File: domTypes.DomFileConstructor;
-  CustomEventInit: typeof customEvent.CustomEventInit;
   CustomEvent: typeof customEvent.CustomEvent;
-  EventInit: typeof event.EventInit;
   Event: typeof event.Event;
-  EventListener: typeof eventTarget.EventListener;
   EventTarget: typeof eventTarget.EventTarget;
   URL: typeof url.URL;
   URLSearchParams: typeof urlSearchParams.URLSearchParams;
@@ -1190,10 +1290,11 @@ declare interface Window {
     callback: (event: domTypes.Event) => void | null,
     options?: boolean | domTypes.EventListenerOptions | undefined
   ) => void;
+  queueMicrotask: (task: () => void) => void;
   Deno: typeof Deno;
 }
 
-declare const window: Window;
+declare const window: Window & typeof globalThis;
 declare const atob: typeof textEncoding.atob;
 declare const btoa: typeof textEncoding.btoa;
 declare const fetch: typeof fetchTypes.fetch;
@@ -1204,6 +1305,7 @@ declare const setTimeout: typeof timers.setTimeout;
 declare const setInterval: typeof timers.setInterval;
 declare const location: domTypes.Location;
 declare const onload: Function | undefined;
+declare const onunload: Function | undefined;
 declare const crypto: Crypto;
 declare const Blob: typeof blob.DenoBlob;
 declare const File: domTypes.DomFileConstructor;
@@ -1239,16 +1341,17 @@ declare const removeEventListener: (
   options?: boolean | domTypes.EventListenerOptions | undefined
 ) => void;
 
-declare type Blob = blob.DenoBlob;
+declare type Blob = domTypes.Blob;
+declare type Body = domTypes.Body;
 declare type File = domTypes.DomFile;
-declare type CustomEventInit = customEvent.CustomEventInit;
-declare type CustomEvent = customEvent.CustomEvent;
-declare type EventInit = event.EventInit;
-declare type Event = event.Event;
-declare type EventListener = eventTarget.EventListener;
-declare type EventTarget = eventTarget.EventTarget;
+declare type CustomEventInit = domTypes.CustomEventInit;
+declare type CustomEvent = domTypes.CustomEvent;
+declare type EventInit = domTypes.EventInit;
+declare type Event = domTypes.Event;
+declare type EventListener = domTypes.EventListener;
+declare type EventTarget = domTypes.EventTarget;
 declare type URL = url.URL;
-declare type URLSearchParams = urlSearchParams.URLSearchParams;
+declare type URLSearchParams = domTypes.URLSearchParams;
 declare type Headers = domTypes.Headers;
 declare type FormData = domTypes.FormData;
 declare type TextEncoder = textEncoding.TextEncoder;
@@ -1279,6 +1382,8 @@ declare interface Crypto {
 }
 
 declare namespace domTypes {
+  // @url js/dom_types.d.ts
+
   export type BufferSource = ArrayBufferView | ArrayBuffer;
   export type HeadersInit =
     | Headers
@@ -1354,7 +1459,7 @@ declare namespace domTypes {
     loaded?: number;
     total?: number;
   }
-  export interface URLSearchParams {
+  export interface URLSearchParams extends DomIterable<string, string> {
     /**
      * Appends a specified key/value pair as a new search parameter.
      */
@@ -1396,7 +1501,7 @@ declare namespace domTypes {
      * and invokes the given function.
      */
     forEach(
-      callbackfn: (value: string, key: string, parent: URLSearchParams) => void,
+      callbackfn: (value: string, key: string, parent: this) => void,
       thisArg?: any
     ): void;
   }
@@ -1850,7 +1955,10 @@ declare namespace domTypes {
 }
 
 declare namespace blob {
+  // @url js/blob.d.ts
+
   export const bytesSymbol: unique symbol;
+  export const blobBytesWeakMap: WeakMap<domTypes.Blob, Uint8Array>;
   export class DenoBlob implements domTypes.Blob {
     private readonly [bytesSymbol];
     readonly size: number;
@@ -1865,22 +1973,22 @@ declare namespace blob {
 }
 
 declare namespace consoleTypes {
+  // @url js/console.d.ts
+
   type ConsoleOptions = Partial<{
     showHidden: boolean;
     depth: number;
     colors: boolean;
     indentLevel: number;
-    collapsedAt: number | null;
   }>;
   export class CSI {
     static kClear: string;
     static kClearScreenDown: string;
   }
-  export const isConsoleInstance: unique symbol;
+  const isConsoleInstance: unique symbol;
   export class Console {
     private printFunc;
     indentLevel: number;
-    collapsedAt: number | null;
     [isConsoleInstance]: boolean;
     /** Writes the arguments to stdout */
     log: (...args: unknown[]) => void;
@@ -1896,9 +2004,29 @@ declare namespace consoleTypes {
         depth: number;
         colors: boolean;
         indentLevel: number;
-        collapsedAt: number | null;
       }>
     ) => void;
+
+    /** From MDN:
+     * Displays an interactive tree of the descendant elements of
+     * the specified XML/HTML element. If it is not possible to display
+     * as an element the JavaScript Object view is shown instead.
+     * The output is presented as a hierarchical listing of expandable
+     * nodes that let you see the contents of child nodes.
+     *
+     * Since we write to stdout, we can't display anything interactive
+     * we just fall back to `console.dir`.
+     */
+    dirxml: (
+      obj: unknown,
+      options?: Partial<{
+        showHidden: boolean;
+        depth: number;
+        colors: boolean;
+        indentLevel: number;
+      }>
+    ) => void;
+
     /** Writes the arguments to stdout */
     warn: (...args: unknown[]) => void;
     /** Writes the arguments to stdout */
@@ -1919,8 +2047,13 @@ declare namespace consoleTypes {
     groupCollapsed: (...label: unknown[]) => void;
     groupEnd: () => void;
     clear: () => void;
+    trace: (...args: unknown[]) => void;
     static [Symbol.hasInstance](instance: Console): boolean;
   }
+  /** A symbol which can be used as a key for a custom method which will be called
+   * when `Deno.inspect()` is called, or when the object is logged to the console.
+   */
+  export const customInspect: unique symbol;
   /**
    * `inspect()` converts input into string that has the same format
    * as printed by `console.log(...)`;
@@ -1929,6 +2062,8 @@ declare namespace consoleTypes {
 }
 
 declare namespace event {
+  // @url js/event.d.ts
+
   export const eventAttributes: WeakMap<object, any>;
   export class EventInit implements domTypes.EventInit {
     bubbles: boolean;
@@ -2000,6 +2135,8 @@ declare namespace event {
 }
 
 declare namespace customEvent {
+  // @url js/custom_event.d.ts
+
   export const customEventAttributes: WeakMap<object, any>;
   export class CustomEventInit extends event.EventInit
     implements domTypes.CustomEventInit {
@@ -2025,6 +2162,8 @@ declare namespace customEvent {
 }
 
 declare namespace eventTarget {
+  // @url js/event_target.d.ts
+
   export class EventListenerOptions implements domTypes.EventListenerOptions {
     _capture: boolean;
     constructor({ capture }?: { capture?: boolean | undefined });
@@ -2088,6 +2227,8 @@ declare namespace eventTarget {
 }
 
 declare namespace io {
+  // @url js/io.d.ts
+
   export const EOF: null;
   export type EOF = null;
   export enum SeekMode {
@@ -2175,6 +2316,8 @@ declare namespace io {
 }
 
 declare namespace fetchTypes {
+  // @url js/fetch.d.ts
+
   class Body implements domTypes.Body, domTypes.ReadableStream, io.ReadCloser {
     private rid;
     readonly contentType: string;
@@ -2198,8 +2341,8 @@ declare namespace fetchTypes {
     [Symbol.asyncIterator](): AsyncIterableIterator<Uint8Array>;
   }
   export class Response implements domTypes.Response {
-    readonly status: number;
     readonly url: string;
+    readonly status: number;
     statusText: string;
     readonly type = "basic";
     readonly redirected: boolean;
@@ -2208,6 +2351,7 @@ declare namespace fetchTypes {
     bodyUsed: boolean;
     readonly body: Body;
     constructor(
+      url: string,
       status: number,
       headersList: Array<[string, string]>,
       rid: number,
@@ -2230,6 +2374,8 @@ declare namespace fetchTypes {
 }
 
 declare namespace textEncoding {
+  // @url js/text_encoding.d.ts
+
   export function atob(s: string): string;
   /** Creates a base-64 ASCII string from the input string. */
   export function btoa(s: string): string;
@@ -2238,7 +2384,7 @@ declare namespace textEncoding {
   }
   export interface TextDecoderOptions {
     fatal?: boolean;
-    ignoreBOM?: false;
+    ignoreBOM?: boolean;
   }
   export class TextDecoder {
     private _encoding;
@@ -2268,6 +2414,8 @@ declare namespace textEncoding {
 }
 
 declare namespace timers {
+  // @url js/timers.d.ts
+
   export type Args = unknown[];
   /** Sets a timer which executes a function once after the timer expires. */
   export function setTimeout(
@@ -2286,6 +2434,8 @@ declare namespace timers {
 }
 
 declare namespace urlSearchParams {
+  // @url js/url_search_params.d.ts
+
   export class URLSearchParams {
     private params;
     private url;
@@ -2345,7 +2495,7 @@ declare namespace urlSearchParams {
      *
      */
     forEach(
-      callbackfn: (value: string, key: string, parent: URLSearchParams) => void,
+      callbackfn: (value: string, key: string, parent: this) => void,
       thisArg?: any
     ): void;
     /** Returns an iterator allowing to go through all keys contained
@@ -2355,7 +2505,7 @@ declare namespace urlSearchParams {
      *         console.log(key);
      *       }
      */
-    keys(): Iterable<string>;
+    keys(): IterableIterator<string>;
     /** Returns an iterator allowing to go through all values contained
      * in this object.
      *
@@ -2363,7 +2513,7 @@ declare namespace urlSearchParams {
      *         console.log(value);
      *       }
      */
-    values(): Iterable<string>;
+    values(): IterableIterator<string>;
     /** Returns an iterator allowing to go through all key/value
      * pairs contained in this object.
      *
@@ -2371,7 +2521,7 @@ declare namespace urlSearchParams {
      *         console.log(key, value);
      *       }
      */
-    entries(): Iterable<[string, string]>;
+    entries(): IterableIterator<[string, string]>;
     /** Returns an iterator allowing to go through all key/value
      * pairs contained in this object.
      *
@@ -2379,7 +2529,7 @@ declare namespace urlSearchParams {
      *         console.log(key, value);
      *       }
      */
-    [Symbol.iterator](): Iterable<[string, string]>;
+    [Symbol.iterator](): IterableIterator<[string, string]>;
     /** Returns a query string suitable for use in a URL.
      *
      *        searchParams.toString();
@@ -2391,6 +2541,9 @@ declare namespace urlSearchParams {
 }
 
 declare namespace url {
+  // @url js/url.d.ts
+
+  export const blobURLMap: Map<string, domTypes.Blob>;
   export class URL {
     private _parts;
     private _searchParams;
@@ -2410,10 +2563,14 @@ declare namespace url {
     constructor(url: string, base?: string | URL);
     toString(): string;
     toJSON(): string;
+    static createObjectURL(b: domTypes.Blob): string;
+    static revokeObjectURL(url: string): void;
   }
 }
 
 declare namespace workers {
+  // @url js/workers.d.ts
+
   export function encodeMessage(data: any): Uint8Array;
   export function decodeMessage(dataIntArray: Uint8Array): any;
   export let onmessage: (e: { data: any }) => void;
@@ -2429,6 +2586,14 @@ declare namespace workers {
     postMessage(data: any): void;
     closed: Promise<void>;
   }
+  export interface WorkerOptions {}
+  /** Extended Deno Worker initialization options.
+   * `noDenoNamespace` hides global `window.Deno` namespace for
+   * spawned worker and nested workers spawned by it (default: false).
+   */
+  export interface DenoWorkerOptions extends WorkerOptions {
+    noDenoNamespace?: boolean;
+  }
   export class WorkerImpl implements Worker {
     private readonly rid;
     private isClosing;
@@ -2436,7 +2601,7 @@ declare namespace workers {
     onerror?: () => void;
     onmessage?: (data: any) => void;
     onmessageerror?: () => void;
-    constructor(specifier: string);
+    constructor(specifier: string, options?: DenoWorkerOptions);
     readonly closed: Promise<void>;
     postMessage(data: any): void;
     private run;
@@ -2444,6 +2609,8 @@ declare namespace workers {
 }
 
 declare namespace performanceUtil {
+  // @url js/performance.d.ts
+
   export class Performance {
     /** Returns a current time from Deno's start in milliseconds.
      *
@@ -2455,6 +2622,8 @@ declare namespace performanceUtil {
     now(): number;
   }
 }
+
+// @url js/lib.web_assembly.d.ts
 
 // This follows the WebIDL at: https://webassembly.github.io/spec/js-api/
 // And follow on WebIDL at: https://webassembly.github.io/spec/web-api/
